@@ -23,7 +23,7 @@ access_secret = keyFile.readline().rstrip()
 ###########TWITTER
 
 app = Flask(__name__)
-JMETER = '/usr/local/bin/jmeter'
+JMETER = 'jmeter'
 workingDir = os.getcwd()
 CONFIG = workingDir + '/../JMeterConfig/config.jmx'
 outputDir = 'static/'
