@@ -14,18 +14,12 @@ import xml.etree.ElementTree as ET
 from werkzeug import secure_filename
 from flask import Flask,render_template, redirect, url_for
 
-
+###########TWITTER
 keyFile = open('keys.txt', 'r')
 consumer_key = keyFile.readline().rstrip()
 consumer_secret = keyFile.readline().rstrip()
 access_key = keyFile.readline().rstrip()
 access_secret = keyFile.readline().rstrip()
-
-###########TWITTER
-# consumer_key = "v7wZkFPdDRHbOonYThE16iuUT"
-# consumer_secret = "73Xw5KSHpQwf7vQuopBnKuBnj51KNjdJ8e5WydqlSWGJO3bzIH"
-# access_key = "836659939468685312-L4vLa4e15ql3LG1Dm34vR0TlwxYeoTP"
-#access_secret = "y4lwfiwEKIWs2XsUwOTqR810c7iLVrDGDJO2pgCxwSki1"
 ###########TWITTER
 
 app = Flask(__name__)
