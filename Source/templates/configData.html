@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class=container>
+  <div class=main>
+    <h1>Data Config</h1>
+    <a href="{{url_for('static', filename='CSV_Data_File.csv')}}">Dataset</a>
+    {% if summaries %}
+      <table>
+      {% for key, value in summaries.iteritems() %}
+        <tr>
+           <td><a href="{{value}}">{{key}}</a></td>
+        </tr>
+      {% endfor %}
+      </table>
+    {% endif %}
+    {% if alltweets %}
+    <h3>Dataset generated with the following tweets...</h3>
+    <table>
+    {% for tweet in alltweets %}
+      <tr>
+         <td><p>{{tweet}}</p></td>
+      </tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+  </div>
+  <div class=aside>
+    <h3>Test Parameters</h3>
+    <form action="configData" method="post">
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              Mic ID
+            </td>
+            <td>
+              <select name="MicID">
+              {% for mic in allMics %}
+                <option value="{{mic}}">{{mic}}</option>
+              {% endfor %}
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Twitter Username
+            </td>
+            <td>
+              <input type="text" name="TwitterUser" value="realDonaldTrump">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Number of tweets to collect
+            </td>
+            <td>
+              <input type="text" name="TweetCount" value="200">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input class=btn type="submit" value="Submit">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+  </div>
+</div>
+{% endblock %}

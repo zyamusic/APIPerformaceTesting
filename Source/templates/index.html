@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class=container>
+  <div class=main>
+    <h1>Summary Reports</h1>
+    {% if summaries %}
+      <table>
+      {% for key, value in summaries.iteritems() %}
+        <tr>
+           <td><a href="{{value}}">{{key}}</a></td>
+        </tr>
+      {% endfor %}
+      </table>
+    {% endif %}
+  </div>
+  <div class=aside>
+    <h3>Test Parameters</h3>
+    <form action="executeTest" method="post">
+      <table>
+        <tbody>
+          {% for key, val in allParams.iteritems() %}
+          <tr>
+            <td>
+              {{key}}:
+            </td>
+            <td>
+              <input type="text" name="{{key}}" value="{{val}}">
+            </td>
+          </tr>
+          {% endfor %}
+          <tr>
+            <td>
+              <input class=btn type="submit" value="Submit">
+            </td>
+            <td>
+              Run Variations
+              <input type="checkbox" name="RunVariations">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+  </div>
+</div>
+{% endblock %}
