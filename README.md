@@ -6,6 +6,7 @@ To install and run the app, ensure you have
   * [jmeter](http://jmeter.apache.org/download_jmeter.cgi) installed and accessible at ```/usr/local/bin/jmeter``` 
   * [Python 2.7.10](https://www.python.org/downloads/release/python-2710/)
     * On your terminal in ```.../APIPerformanceTesting/Source``` run ```pip install -r requirements.txt```
+  * [DittyAudioContent](https://github.com/zyamusic) repo in the same directory as the APIPerformanceTesting repo
   * Twitter api key file ```keys.txt``` in ```.../APIPerformanceTesting/Source```
 
 ## Usage
