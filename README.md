@@ -10,7 +10,7 @@ To install and run the app, ensure you have
   * Twitter api key file ```keys.txt``` in ```.../APIPerformanceTesting/Source```
 
 ## Usage
-To run the app, cd to the Source folder and run ```python app.py``` The webserver will be listening on {your ip || localhost}:8181
+To run the app, cd to the Source folder and run ```python app.py``` The webserver will be listening on [YourIP:8181 externally or localhost:8181](http://localhost:8181)
 
 > ### Index
 > This page lists all html reports in the ```Source/static/Output``` folder and allows the user to start a new test run with the form on the right side.
