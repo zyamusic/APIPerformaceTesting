@@ -11,11 +11,11 @@ To install and run the app, ensure you have
 ## Usage
 To run the app, cd to the Source folder and run ```python app.py``` The webserver will be listening on {your ip || localhost}:8181
 
-### Index
-This page lists all html reports in the ```Source/static/Output``` folder and allows the user to start a new test run with the form on the right side.
+> ### Index
+> This page lists all html reports in the ```Source/static/Output``` folder and allows the user to start a new test run with the form on the right side.
 
-### Configure Dataset
-Here you can create a new dataset to use based on a mic id and tweets from a specific user.
+> ### Configure Dataset
+> Here you can create a new dataset to use based on a mic id and tweets from a specific user.
 
-### Upload a new jmx
-This allows you to change the config of the tests being run.
+> ### Upload a new jmx
+> This allows you to change the config of the tests being run.
