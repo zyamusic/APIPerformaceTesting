@@ -9,10 +9,9 @@ import codecs
 import tweepy
 import urllib
 import itertools as itt
-from flask import request
 import xml.etree.ElementTree as ET
 from werkzeug import secure_filename
-from flask import Flask,render_template, redirect, url_for
+from flask import Flask,render_template, redirect, url_for, request
 
 ###########TWITTER
 keyFile = open('keys.txt', 'r')
@@ -23,6 +22,8 @@ access_secret = keyFile.readline().rstrip()
 ###########TWITTER
 
 app = Flask(__name__)
+
+############ BASE CONFIG ###########
 JMETER = 'jmeter'
 workingDir = os.getcwd()
 CONFIG = workingDir + '/../JMeterConfig/config.jmx'
@@ -41,6 +42,7 @@ bypassOptions = ['0','1']
 SubprocOptions = ['0','1']
 
 jMeterArgs = {}
+############ BASE CONFIG ###########
 
 # Homepage
 @app.route('/')
@@ -104,10 +106,12 @@ def executeTest():
             OUTPUT_HTML = OUTPUT + '_HTML'
             OUTPUTFile = OUTPUT + '.csv'
 
-            # Run jmeter command
-            print JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML
+            RunJMeter(CONFIG, OUTPUTFile, OUTPUT_HTML, True)
 
-            os.system(JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML)
+            # Run jmeter command
+            # print JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML
+            #
+            # os.system(JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML)
 
         return redirect(url_for('index'))
 
@@ -280,9 +284,10 @@ def runVariations ():
             OUTPUT_HTML = OUTPUT + '_HTML'
             OUTPUTFile = OUTPUT + '.csv'
 
-            print JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML
-
-            os.system(JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML)
+            RunJMeter(CONFIG, OUTPUTFile, OUTPUT_HTML, False)
+            # print JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML
+            #
+            # os.system(JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML)
         print 'starting next permutation'
 
 # Updates the dictionary that holds the test parameters
@@ -297,6 +302,17 @@ def GetNewJMX():
                     currentArg = neighbor.attrib.get('name')
                     allParams[currentArg] = child.text
     return allParams
+
+def RunJMeter(configPath, outputFile, outputHTML, asDaemon):
+    cmd = JMETER + ' -n -t ' + configPath + ' -l ' +outputFile + ' -e -o ' + outputHTML
+
+    if asDaemon:
+        cmd = cmd + ' &'
+
+    # Run jmeter command
+    print cmd
+
+    os.system(cmd)
 
 # Checks if string is not blank or empty
 def isNotBlank (myString):
