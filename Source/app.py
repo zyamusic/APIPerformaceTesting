@@ -9,10 +9,9 @@ import codecs
 import tweepy
 import urllib
 import itertools as itt
-from flask import request
 import xml.etree.ElementTree as ET
 from werkzeug import secure_filename
-from flask import Flask,render_template, redirect, url_for
+from flask import Flask,render_template, redirect, url_for, request
 
 ###########TWITTER
 keyFile = open('keys.txt', 'r')
@@ -23,6 +22,8 @@ access_secret = keyFile.readline().rstrip()
 ###########TWITTER
 
 app = Flask(__name__)
+
+############ BASE CONFIG ###########
 JMETER = 'jmeter'
 workingDir = os.getcwd()
 CONFIG = workingDir + '/../JMeterConfig/config.jmx'
@@ -39,8 +40,12 @@ shiftOptions = ['4', '5','6','7','8']
 threadedOptions = ['0','1']
 bypassOptions = ['0','1']
 SubprocOptions = ['0','1']
+globalSelectedMic = 'all'
+globalTwitterUser = 'theRealDonaldTrump'
+globalDataUsing = 'CSV_Data_File.csv'
 
 jMeterArgs = {}
+############ BASE CONFIG ###########
 
 # Homepage
 @app.route('/')
@@ -51,11 +56,9 @@ def index():
     allParams = GetNewJMX()
 
     # display all summary files
-    summaries = {}
-    for outFile in glob.iglob('static/Output/**/*.html'):
-        print outFile
-        summaries[outFile] = '/' + outFile
-    return render_template('index.html', summaries=summaries, allParams=allParams)
+    summaries = GetSummaries()
+
+    return render_template('index.html', summaries=summaries, allParams=allParams,currentDataset=globalDataUsing)
 
 # Testing area
 @app.route('/executeTest', methods=['GET','POST'])
@@ -64,10 +67,8 @@ def executeTest():
     global allParams
     if request.method == 'GET':
         allParams = GetNewJMX()
-        summaries = {}
-        for outFile in glob.iglob('static/Output/**/*.html'):
-            print outFile
-            summaries[outFile] = '/' + outFile
+        summaries = GetSummaries()
+
         return render_template('index.html', summaries=summaries, allParams=allParams)
 
     else:
@@ -98,16 +99,16 @@ def executeTest():
             # prepare outut strings
             timestr = time.strftime("%H%M%S")
             OUTPUT = 'static/Output/' + timestr
-            for arg, val in allParams.iteritems():
-                OUTPUT += '_' + arg[0] + jMeterArgs[arg]
+            OUTPUT += '_' + jMeterArgs['out_cfg']
+            OUTPUT += '_srvr-' + jMeterArgs['targetServer']
+            OUTPUT += '_' + jMeterArgs['num_Dittys'] + 'Dittys'
+            # for arg, val in allParams.iteritems():
+            #     OUTPUT += '_' + arg[0] + jMeterArgs[arg]
 
             OUTPUT_HTML = OUTPUT + '_HTML'
             OUTPUTFile = OUTPUT + '.csv'
 
-            # Run jmeter command
-            print JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML
-
-            os.system(JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML)
+            RunJMeter(CONFIG, OUTPUTFile, OUTPUT_HTML, True)
 
         return redirect(url_for('index'))
 
@@ -116,18 +117,18 @@ def executeTest():
 def configData():
     # Get mic ids for form'
     allMics = getAllMicIDs()
+    datasets = GetDatasets()
 
     if request.method == 'GET':
-        summaries = {}
-        for outFile in glob.iglob('static/Output/**/*.html'):
-            print outFile
-            summaries[outFile] = '/' + outFile
-        return render_template('configData.html', summaries=summaries, allMics=allMics)
+        return render_template('configData.html', datasets=datasets, allMics=allMics)
 
     else:
         selectedMicID = request.form['MicID']
         tweetUser = request.form['TwitterUser']
         tweetCount = request.form['TweetCount']
+
+        globalSelectedMic = selectedMicID
+        globalTwitterUser = tweetUser
 
         # Prepare dataset
         alltweets = getAllTweets(tweetUser,tweetCount)
@@ -137,9 +138,9 @@ def configData():
             dataPairs.append(permutation)
 
         # Write dataset
-        writeDataFile(dataPairs)
+        writeDataFile(dataPairs, selectedMicID, tweetUser, tweetCount)
 
-        return render_template('configData.html',allMics=allMics,alltweets=alltweets)
+        return redirect(url_for('index'))
 
 # Upload a new configuration
 @app.route('/upload_jmx', methods=['GET','POST'])
@@ -166,6 +167,32 @@ def upload_jmx():
 
         return render_template('upload_jmx.html')
 
+# Upload a new configuration
+@app.route('/upload_data', methods=['POST'])
+def upload_data():
+    global globalDataUsing
+
+    switchData = request.form.get('dataset')
+    timestr = time.strftime("%H%M%S")
+    if switchData:
+        globalDataUsing = switchData
+        shutil.copy(os.getcwd() + '/CSV_Data_File.csv',os.getcwd() + '/static/Data/' + timestr + '_'+switchData)
+        shutil.copy(os.getcwd() + '/static/Data/' + switchData, os.getcwd() + '/CSV_Data_File.csv')
+        shutil.copy(os.getcwd() + '/static/Data/' + switchData, os.getcwd() + '/static/CSV_Data_File.csv')
+    else:
+        # Save old versions and update for new config
+        # Put in static folder to serve them over http
+        f = request.files['file']
+        f.save(secure_filename(f.filename))
+
+        globalDataUsing = f.filename
+
+        shutil.copy(os.getcwd() + '/CSV_Data_File.csv',os.getcwd() + '/static/Data/' + timestr + '_CSV_Data_File.csv')
+        shutil.copy(f.filename, os.getcwd() + '/CSV_Data_File.csv')
+        shutil.copy(f.filename, os.getcwd() + '/static/CSV_Data_File.csv')
+
+    return redirect(url_for('configData'))
+
 # Get all songs based on mic id
 def getAllSongs(micID):
     songs = []
@@ -174,7 +201,9 @@ def getAllSongs(micID):
             jsonFile = SONGS + '/' + item + '/' + item + '.json'
             if os.path.exists(jsonFile):
                 with codecs.open(jsonFile,'r',encoding='utf-8') as file:
-                    if any(micID in line for line in file):
+                    if 'all' in micID:
+                        songs.append(item.encode('utf-8'))
+                    elif any(micID in line for line in file):
                         songs.append(item.encode('utf-8'))
     return songs
 
@@ -189,7 +218,8 @@ def getAllMicIDs():
                     for line in jFile:
                         if 'micID' in line:
                             mic = line.split(':')[1].strip().replace('\"','').replace(',','')
-                            mics.add(mic)
+                            if isNotBlank(mic):
+                                mics.add(mic)
     return mics
 
 # Get a specified number of tweets from a twitter user
@@ -235,8 +265,11 @@ def getAllTweets(screen_name, tweetCount):
     return tweetText
 
 # Writes the dataset of (text,song)
-def writeDataFile(pairs):
-    csv_data_file_name = "static/CSV_Data_File.csv"
+def writeDataFile(pairs, micId, twitterUser, tweetCount):
+    global globalDataUsing
+
+    csv_data_file_name = "static/Data/" + micId + "_" +twitterUser + "_" + tweetCount + "Data.csv"
+    globalDataUsing = csv_data_file_name[12:]
 
     with open( csv_data_file_name, 'w' ) as csvfile:
         for p in pairs:
@@ -248,6 +281,7 @@ def writeDataFile(pairs):
                 csvfile.write( text + "," + song + "\n" )
 
     shutil.copy(csv_data_file_name, os.getcwd() + '/CSV_Data_File.csv')
+    shutil.copy(csv_data_file_name, os.getcwd() + '/static/CSV_Data_File.csv')
 
 # Runs all permutations of perfrmance tests
 def runVariations ():
@@ -275,14 +309,18 @@ def runVariations ():
             tree.write(CONFIG)
 
             timestr = time.strftime("%Y%m%d-%H%M%S")
-            OUTPUT = 'static/Output/' + timestr + '_' + jMeterArgs['targetServer'] + '_' + jMeterArgs['num_Dittys'] + '_' + jMeterArgs['shiftBufferBy'] + '_' + jMeterArgs['writeOnBgThread'] + '_' + jMeterArgs['bypassOGGEncoding'] + '_' + jMeterArgs['useSubProcess']
+            OUTPUT += '_' + jMeterArgs['out_cfg']
+            OUTPUT += '_' + jMeterArgs['num_Dittys'] + 'Dittys'
+            # for arg, val in allParams.iteritems():
+            #     OUTPUT += '_' + arg[0] + jMeterArgs[arg]
 
             OUTPUT_HTML = OUTPUT + '_HTML'
             OUTPUTFile = OUTPUT + '.csv'
 
-            print JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML
-
-            os.system(JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML)
+            RunJMeter(CONFIG, OUTPUTFile, OUTPUT_HTML, False)
+            # print JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML
+            #
+            # os.system(JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML)
         print 'starting next permutation'
 
 # Updates the dictionary that holds the test parameters
@@ -297,6 +335,31 @@ def GetNewJMX():
                     currentArg = neighbor.attrib.get('name')
                     allParams[currentArg] = child.text
     return allParams
+
+def RunJMeter(configPath, outputFile, outputHTML, asDaemon):
+    cmd = JMETER + ' -n -t ' + configPath + ' -l ' +outputFile + ' -e -o ' + outputHTML
+
+    if asDaemon:
+        cmd = cmd + ' &'
+
+    # Run jmeter command
+    print cmd
+
+    os.system(cmd)
+
+def GetSummaries():
+    summaries = {}
+    for outFile in glob.iglob('static/Output/**/*.html'):
+        outKey = outFile[14:]
+        summaries[outKey] = '/' + outFile
+    return summaries
+
+def GetDatasets():
+    datasets = {}
+    for outFile in glob.iglob('static/Data/*.csv'):
+        outKey = outFile[12:]
+        datasets[outKey] = '/' + outFile
+    return datasets
 
 # Checks if string is not blank or empty
 def isNotBlank (myString):

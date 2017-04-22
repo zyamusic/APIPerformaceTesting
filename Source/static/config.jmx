@@ -34,34 +34,14 @@
               <stringProp name="Argument.desc">current test directory</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
-            <elementProp name="shiftBufferBy" elementType="Argument">
-              <stringProp name="Argument.name">shiftBufferBy</stringProp>
-              <stringProp name="Argument.value">6</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
             <elementProp name="out_cfg" elementType="Argument">
               <stringProp name="Argument.name">out_cfg</stringProp>
-              <stringProp name="Argument.value">.</stringProp>
+              <stringProp name="Argument.value">temp_</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
             <elementProp name="num_Dittys" elementType="Argument">
               <stringProp name="Argument.name">num_Dittys</stringProp>
-              <stringProp name="Argument.value">200</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-            <elementProp name="writeOnBgThread" elementType="Argument">
-              <stringProp name="Argument.name">writeOnBgThread</stringProp>
-              <stringProp name="Argument.value">0</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-            <elementProp name="bypassOGGEncoding" elementType="Argument">
-              <stringProp name="Argument.name">bypassOGGEncoding</stringProp>
-              <stringProp name="Argument.value">0</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-            <elementProp name="useSubProcess" elementType="Argument">
-              <stringProp name="Argument.name">useSubProcess</stringProp>
-              <stringProp name="Argument.value">0</stringProp>
+              <stringProp name="Argument.value">100</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
             <elementProp name="targetServer" elementType="Argument">
@@ -71,7 +51,12 @@
             </elementProp>
             <elementProp name="targetPort" elementType="Argument">
               <stringProp name="Argument.name">targetPort</stringProp>
-              <stringProp name="Argument.value">8080</stringProp>
+              <stringProp name="Argument.value">4000</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="apikey" elementType="Argument">
+              <stringProp name="Argument.name">apikey</stringProp>
+              <stringProp name="Argument.value">testkey</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
           </collectionProp>
@@ -80,41 +65,6 @@
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments">
-              <elementProp name="useMTWrite" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <stringProp name="Argument.value">${writeOnBgThread}</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                <stringProp name="Argument.name">useMTWrite</stringProp>
-              </elementProp>
-              <elementProp name="numberOfKiloSamples" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <stringProp name="Argument.value">${shiftBufferBy}</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                <stringProp name="Argument.name">numberOfKiloSamples</stringProp>
-              </elementProp>
-              <elementProp name="bypassOGGEncoding" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <stringProp name="Argument.value">${bypassOGGEncoding}</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                <stringProp name="Argument.name">bypassOGGEncoding</stringProp>
-              </elementProp>
-              <elementProp name="useSubProcess" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <stringProp name="Argument.value">${useSubProcess}</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                <stringProp name="Argument.name">useSubProcess</stringProp>
-              </elementProp>
-              <elementProp name="inputLanguage" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <stringProp name="Argument.value">en</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                <stringProp name="Argument.name">inputLanguage</stringProp>
-              </elementProp>
               <elementProp name="text" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">true</boolProp>
                 <stringProp name="Argument.value">${text}</stringProp>
@@ -122,12 +72,12 @@
                 <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 <stringProp name="Argument.name">text</stringProp>
               </elementProp>
-              <elementProp name="song" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <stringProp name="Argument.value">${song}</stringProp>
+              <elementProp name="apikey" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${apikey}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
                 <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                <stringProp name="Argument.name">song</stringProp>
+                <stringProp name="Argument.name">apikey</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>

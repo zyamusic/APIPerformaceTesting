@@ -11,9 +11,14 @@
         </tr>
       {% endfor %}
       </table>
+      {% else %}
+        No Summaries.
     {% endif %}
   </div>
   <div class=aside>
+    <h3>Current Dataset</h3>
+    {{currentDataset}}
+    <hr>
     <h3>Test Parameters</h3>
     <form action="executeTest" method="post">
       <table>

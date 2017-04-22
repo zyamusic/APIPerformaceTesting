@@ -3,15 +3,25 @@
 <div class=container>
   <div class=main>
     <h1>Data Config</h1>
-    <a href="{{url_for('static', filename='CSV_Data_File.csv')}}">Dataset</a>
-    {% if summaries %}
+    <a class=btn href="{{url_for('static', filename='CSV_Data_File.csv')}}">Download Current Dataset</a>
+    <hr>
+    <h3>Past Datasets</h3>
+    {% if datasets %}
       <table>
-      {% for key, value in summaries.iteritems() %}
+      {% for key, value in datasets.iteritems() %}
         <tr>
            <td><a href="{{value}}">{{key}}</a></td>
+           <td>
+             <form action = "upload_data" method = "POST">
+               <input type="hidden" name="dataset" value="{{key}}"/>
+               <input class=btn value = "Use this" type = "submit"/>
+            </form>
+           </td>
         </tr>
       {% endfor %}
       </table>
+    {% else %}
+      No Datasets.
     {% endif %}
     {% if alltweets %}
     <h3>Dataset generated with the following tweets...</h3>
@@ -25,7 +35,7 @@
     {% endif %}
   </div>
   <div class=aside>
-    <h3>Test Parameters</h3>
+    <h3>New Dataset</h3>
     <form action="configData" method="post">
       <table>
         <tbody>
@@ -35,6 +45,7 @@
             </td>
             <td>
               <select name="MicID">
+                <option value="all" selected="selected">all</option>
               {% for mic in allMics %}
                 <option value="{{mic}}">{{mic}}</option>
               {% endfor %}
@@ -64,6 +75,12 @@
           </tr>
         </tbody>
       </table>
+    </form>
+    <h3>Upload Dataset</h3>
+    <form action = "upload_data" method = "POST"
+         enctype = "multipart/form-data">
+         <input type = "file" name = "file" />
+         <input class=btn type = "submit"/>
     </form>
   </div>
 </div>
