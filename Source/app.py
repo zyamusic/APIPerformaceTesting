@@ -40,6 +40,9 @@ shiftOptions = ['4', '5','6','7','8']
 threadedOptions = ['0','1']
 bypassOptions = ['0','1']
 SubprocOptions = ['0','1']
+globalSelectedMic = 'all'
+globalTwitterUser = 'theRealDonaldTrump'
+globalDataUsing = 'CSV_Data_File.csv'
 
 jMeterArgs = {}
 ############ BASE CONFIG ###########
@@ -55,7 +58,7 @@ def index():
     # display all summary files
     summaries = GetSummaries()
 
-    return render_template('index.html', summaries=summaries, allParams=allParams)
+    return render_template('index.html', summaries=summaries, allParams=allParams,currentDataset=globalDataUsing)
 
 # Testing area
 @app.route('/executeTest', methods=['GET','POST'])
@@ -96,8 +99,11 @@ def executeTest():
             # prepare outut strings
             timestr = time.strftime("%H%M%S")
             OUTPUT = 'static/Output/' + timestr
-            for arg, val in allParams.iteritems():
-                OUTPUT += '_' + arg[0] + jMeterArgs[arg]
+            OUTPUT += '_' + jMeterArgs['out_cfg']
+            OUTPUT += '_srvr-' + jMeterArgs['targetServer']
+            OUTPUT += '_' + jMeterArgs['num_Dittys'] + 'Dittys'
+            # for arg, val in allParams.iteritems():
+            #     OUTPUT += '_' + arg[0] + jMeterArgs[arg]
 
             OUTPUT_HTML = OUTPUT + '_HTML'
             OUTPUTFile = OUTPUT + '.csv'
@@ -121,6 +127,9 @@ def configData():
         tweetUser = request.form['TwitterUser']
         tweetCount = request.form['TweetCount']
 
+        globalSelectedMic = selectedMicID
+        globalTwitterUser = tweetUser
+
         # Prepare dataset
         alltweets = getAllTweets(tweetUser,tweetCount)
         allSongs = getAllSongs(selectedMicID)
@@ -131,7 +140,7 @@ def configData():
         # Write dataset
         writeDataFile(dataPairs, selectedMicID, tweetUser, tweetCount)
 
-        return redirect(url_for('configData'))
+        return redirect(url_for('index'))
 
 # Upload a new configuration
 @app.route('/upload_jmx', methods=['GET','POST'])
@@ -161,11 +170,12 @@ def upload_jmx():
 # Upload a new configuration
 @app.route('/upload_data', methods=['POST'])
 def upload_data():
-    print 'UPLOADING'
+    global globalDataUsing
 
     switchData = request.form.get('dataset')
     timestr = time.strftime("%H%M%S")
     if switchData:
+        globalDataUsing = switchData
         shutil.copy(os.getcwd() + '/CSV_Data_File.csv',os.getcwd() + '/static/Data/' + timestr + '_'+switchData)
         shutil.copy(os.getcwd() + '/static/Data/' + switchData, os.getcwd() + '/CSV_Data_File.csv')
         shutil.copy(os.getcwd() + '/static/Data/' + switchData, os.getcwd() + '/static/CSV_Data_File.csv')
@@ -174,6 +184,8 @@ def upload_data():
         # Put in static folder to serve them over http
         f = request.files['file']
         f.save(secure_filename(f.filename))
+
+        globalDataUsing = f.filename
 
         shutil.copy(os.getcwd() + '/CSV_Data_File.csv',os.getcwd() + '/static/Data/' + timestr + '_CSV_Data_File.csv')
         shutil.copy(f.filename, os.getcwd() + '/CSV_Data_File.csv')
@@ -189,7 +201,9 @@ def getAllSongs(micID):
             jsonFile = SONGS + '/' + item + '/' + item + '.json'
             if os.path.exists(jsonFile):
                 with codecs.open(jsonFile,'r',encoding='utf-8') as file:
-                    if any(micID in line for line in file):
+                    if 'all' in micID:
+                        songs.append(item.encode('utf-8'))
+                    elif any(micID in line for line in file):
                         songs.append(item.encode('utf-8'))
     return songs
 
@@ -204,7 +218,8 @@ def getAllMicIDs():
                     for line in jFile:
                         if 'micID' in line:
                             mic = line.split(':')[1].strip().replace('\"','').replace(',','')
-                            mics.add(mic)
+                            if isNotBlank(mic):
+                                mics.add(mic)
     return mics
 
 # Get a specified number of tweets from a twitter user
@@ -251,7 +266,10 @@ def getAllTweets(screen_name, tweetCount):
 
 # Writes the dataset of (text,song)
 def writeDataFile(pairs, micId, twitterUser, tweetCount):
+    global globalDataUsing
+
     csv_data_file_name = "static/Data/" + micId + "_" +twitterUser + "_" + tweetCount + "Data.csv"
+    globalDataUsing = csv_data_file_name[12:]
 
     with open( csv_data_file_name, 'w' ) as csvfile:
         for p in pairs:
@@ -291,7 +309,10 @@ def runVariations ():
             tree.write(CONFIG)
 
             timestr = time.strftime("%Y%m%d-%H%M%S")
-            OUTPUT = 'static/Output/' + timestr + '_' + jMeterArgs['targetServer'] + '_' + jMeterArgs['num_Dittys'] + '_' + jMeterArgs['shiftBufferBy'] + '_' + jMeterArgs['writeOnBgThread'] + '_' + jMeterArgs['bypassOGGEncoding'] + '_' + jMeterArgs['useSubProcess']
+            OUTPUT += '_' + jMeterArgs['out_cfg']
+            OUTPUT += '_' + jMeterArgs['num_Dittys'] + 'Dittys'
+            # for arg, val in allParams.iteritems():
+            #     OUTPUT += '_' + arg[0] + jMeterArgs[arg]
 
             OUTPUT_HTML = OUTPUT + '_HTML'
             OUTPUTFile = OUTPUT + '.csv'

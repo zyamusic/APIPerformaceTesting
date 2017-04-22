@@ -45,6 +45,7 @@
             </td>
             <td>
               <select name="MicID">
+                <option value="all" selected="selected">all</option>
               {% for mic in allMics %}
                 <option value="{{mic}}">{{mic}}</option>
               {% endfor %}
