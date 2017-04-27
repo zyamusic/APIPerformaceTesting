@@ -100,7 +100,6 @@ def executeTest():
             timestr = time.strftime("%H%M%S")
             OUTPUT = 'static/Output/' + timestr
             OUTPUT += '_' + jMeterArgs['out_cfg']
-            OUTPUT += '_srvr-' + jMeterArgs['targetServer']
             OUTPUT += '_' + jMeterArgs['num_Dittys'] + 'Dittys'
             # for arg, val in allParams.iteritems():
             #     OUTPUT += '_' + arg[0] + jMeterArgs[arg]
