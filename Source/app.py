@@ -7,7 +7,7 @@ import time
 import shutil
 import codecs
 import tweepy
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import itertools as itt
 import xml.etree.ElementTree as ET
 from werkzeug import secure_filename
@@ -73,8 +73,8 @@ def executeTest():
 
     else:
         # Get test params
-        for arg,val in allParams.iteritems():
-            print arg
+        for arg,val in allParams.items():
+            print(arg)
             jMeterArgs[arg] = request.form[arg]
 
         # Check if running permutations
@@ -83,7 +83,7 @@ def executeTest():
             runVariations()
         else:
             # Update configs values
-            print 'making conifg'
+            print('making conifg')
             tree = ET.parse(CONFIG)
             root = tree.getroot()
             for neighbor in root.iter('elementProp'):
@@ -92,7 +92,7 @@ def executeTest():
                         if child.attrib.get('name') == 'Argument.value':
                             currentArg = neighbor.attrib.get('name')
                             child.text = jMeterArgs[currentArg]
-                            print neighbor.attrib.get('name') + ' = ' + child.text
+                            print(neighbor.attrib.get('name') + ' = ' + child.text)
 
             tree.write(CONFIG)
 
@@ -145,7 +145,7 @@ def configData():
 @app.route('/upload_jmx', methods=['GET','POST'])
 def upload_jmx():
     global allParams
-    print 'UPLOADING'
+    print('UPLOADING')
 
     if request.method == 'GET':
         allParams = GetNewJMX()
@@ -273,7 +273,7 @@ def writeDataFile(pairs, micId, twitterUser, tweetCount):
     with open( csv_data_file_name, 'w' ) as csvfile:
         for p in pairs:
             t,s=p
-            text = urllib.quote_plus( t.encode('utf-8') )
+            text = urllib.parse.quote_plus( t.encode('utf-8') )
             song = s.encode('utf-8')
             text = re.sub(r"http\S+", "", text) # Remove http links
             if isNotBlank(text) and isNotBlank(song):
@@ -293,7 +293,7 @@ def runVariations ():
         jMeterArgs['useSubProcess'] = subproc
 
         if subproc == '0' and bypass == '0':
-            print 'Unneccessary run'
+            print('Unneccessary run')
         else:
             tree = ET.parse(CONFIG)
             root = tree.getroot()
@@ -303,7 +303,7 @@ def runVariations ():
                         if child.attrib.get('name') == 'Argument.value':
                             currentArg = neighbor.attrib.get('name')
                             child.text = jMeterArgs[currentArg]
-                            print neighbor.attrib.get('name') + ' = ' + child.text
+                            print(neighbor.attrib.get('name') + ' = ' + child.text)
 
             tree.write(CONFIG)
 
@@ -320,7 +320,7 @@ def runVariations ():
             # print JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML
             #
             # os.system(JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML)
-        print 'starting next permutation'
+        print('starting next permutation')
 
 # Updates the dictionary that holds the test parameters
 def GetNewJMX():
@@ -342,7 +342,7 @@ def RunJMeter(configPath, outputFile, outputHTML, asDaemon):
         cmd = cmd + ' &'
 
     # Run jmeter command
-    print cmd
+    print(cmd)
 
     os.system(cmd)
 

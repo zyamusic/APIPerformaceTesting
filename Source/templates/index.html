@@ -5,7 +5,7 @@
     <h1>Summary Reports</h1>
     {% if summaries %}
       <table>
-      {% for key, value in summaries.iteritems() %}
+      {% for key, value in summaries.items() %}
         <tr>
            <td><a href="{{value}}">{{key}}</a></td>
         </tr>
@@ -23,7 +23,7 @@
     <form action="executeTest" method="post">
       <table>
         <tbody>
-          {% for key, val in allParams.iteritems() %}
+          {% for key, val in allParams.items() %}
           <tr>
             <td>
               {{key}}:
