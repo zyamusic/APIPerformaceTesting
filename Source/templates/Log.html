@@ -1,0 +1,13 @@
+<meta http-equiv="refresh" content="3">
+{% extends "layout.html" %}
+{% block body %}
+    <h1>Jmeter Log</h1>
+    <div class=log>
+    {% if logData is not none %}
+      {% for line in logData %}
+        <p>{{ line }}</p>
+      {% endfor%}
+    {% endif %}
+  </div>
+
+{% endblock %}

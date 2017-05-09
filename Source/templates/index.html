@@ -5,11 +5,16 @@
     <h1>Summary Reports</h1>
     {% if summaries %}
       <table>
-      {% for key, value in summaries.items() %}
-        <tr>
-           <td><a href="{{value}}">{{key}}</a></td>
-        </tr>
-      {% endfor %}
+        {% for summary in summaries %}
+            <tr>
+               <td>{{ summary['description'] }}</td>
+               <td><a href="{{summary['zip']}}">Artifacts</a></td>
+               <td><a href="{{summary['report']}}">HTML Report</a></td>
+               <td><a href="{{summary['overall']}}">Overall</a></td>
+               <td><a href="{{summary['old']}}">Old</a></td>
+               <td><a href="{{summary['new']}}">New</a></td>
+            </tr>
+          {% endfor %}
       </table>
       {% else %}
         No Summaries.
@@ -35,12 +40,26 @@
           {% endfor %}
           <tr>
             <td>
+              Salt Data:
+            </td>
+            <td>
+              <input type="text" name="SaltDatasetText" value="swag">
+            </td>
+          </tr>
+          <tr>
+            <td>
               <input class=btn type="submit" value="Submit">
             </td>
+            <td>
+              Salt Dataset
+              <input type="checkbox" name="SaltDataset" checked="true">
+            </td>
+            <!--
             <td>
               Run Variations
               <input type="checkbox" name="RunVariations">
             </td>
+            -->
           </tr>
         </tbody>
       </table>

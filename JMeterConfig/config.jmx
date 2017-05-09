@@ -14,7 +14,32 @@
         <collectionProp name="Arguments.arguments">
           <elementProp elementType="Argument" name="out_cfg">
             <stringProp name="Argument.name">out_cfg</stringProp>
-            <stringProp name="Argument.value">CNN_Short_Shuf_Split_tiny</stringProp>
+            <stringProp name="Argument.value">out3swagger/09-05-17_16:28:34/</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp elementType="Argument" name="request_delay">
+            <stringProp name="Argument.name">request_delay</stringProp>
+            <stringProp name="Argument.value">300</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp elementType="Argument" name="num_Dittys">
+            <stringProp name="Argument.name">num_Dittys</stringProp>
+            <stringProp name="Argument.value">4</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp elementType="Argument" name="apikey">
+            <stringProp name="Argument.name">apikey</stringProp>
+            <stringProp name="Argument.value">pazf7HBgQyijpyctzaTlzQ</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp elementType="Argument" name="thread_count">
+            <stringProp name="Argument.name">thread_count</stringProp>
+            <stringProp name="Argument.value">4</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp elementType="Argument" name="targetPort">
+            <stringProp name="Argument.name">targetPort</stringProp>
+            <stringProp name="Argument.value">3000</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -26,7 +51,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">${num_Dittys}</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${thread_count}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">1</stringProp>
         <longProp name="ThreadGroup.start_time">1490375331000</longProp>
         <longProp name="ThreadGroup.end_time">1490375331000</longProp>
@@ -35,42 +60,6 @@
         <stringProp name="ThreadGroup.delay" />
       </ThreadGroup>
       <hashTree>
-        <Arguments enabled="true" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-          <collectionProp name="Arguments.arguments">
-            <elementProp elementType="Argument" name="cwd">
-              <stringProp name="Argument.name">cwd</stringProp>
-              <stringProp name="Argument.value">.</stringProp>
-              <stringProp name="Argument.desc">current test directory</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-            <elementProp elementType="Argument" name="out_cfg_new">
-              <stringProp name="Argument.name">out_cfg_new</stringProp>
-              <stringProp name="Argument.value">opt_NEW</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-            <elementProp elementType="Argument" name="num_Dittys">
-              <stringProp name="Argument.name">num_Dittys</stringProp>
-              <stringProp name="Argument.value">5</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-            <elementProp elementType="Argument" name="targetServer_new">
-              <stringProp name="Argument.name">targetServer_new</stringProp>
-              <stringProp name="Argument.value">ec2-54-190-33-42.us-west-2.compute.amazonaws.com</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-            <elementProp elementType="Argument" name="targetPort">
-              <stringProp name="Argument.name">targetPort</stringProp>
-              <stringProp name="Argument.value">3000</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-            <elementProp elementType="Argument" name="apikey">
-              <stringProp name="Argument.name">apikey</stringProp>
-              <stringProp name="Argument.value">testkey</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-          </collectionProp>
-        </Arguments>
-        <hashTree />
         <HTTPSamplerProxy enabled="true" guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="MIXER4.2">
           <elementProp elementType="Arguments" enabled="true" guiclass="HTTPArgumentsPanel" name="HTTPsampler.Arguments" testclass="Arguments" testname="User Defined Variables">
             <collectionProp name="Arguments.arguments">
@@ -99,8 +88,8 @@
           </elementProp>
           <stringProp name="HTTPSampler.domain">${targetServer_new}</stringProp>
           <stringProp name="HTTPSampler.port">${targetPort}</stringProp>
-          <stringProp name="HTTPSampler.connect_timeout" />
-          <stringProp name="HTTPSampler.response_timeout" />
+          <stringProp name="HTTPSampler.connect_timeout">1000</stringProp>
+          <stringProp name="HTTPSampler.response_timeout">5000</stringProp>
           <stringProp name="HTTPSampler.protocol" />
           <stringProp name="HTTPSampler.contentEncoding" />
           <stringProp name="HTTPSampler.path">/song/play.mp4</stringProp>
@@ -112,6 +101,20 @@
           <boolProp name="HTTPSampler.monitor">false</boolProp>
           <stringProp name="HTTPSampler.embedded_url_re" />
         </HTTPSamplerProxy>
+        <hashTree />
+        <ConstantTimer enabled="true" guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="4.2Timer">
+          <stringProp name="ConstantTimer.delay">${request_delay}</stringProp>
+        </ConstantTimer>
+        <hashTree />
+        <Arguments enabled="true" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+          <collectionProp name="Arguments.arguments">
+            <elementProp elementType="Argument" name="targetServer_new">
+              <stringProp name="Argument.name">targetServer_new</stringProp>
+              <stringProp name="Argument.value">localhost</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+          </collectionProp>
+        </Arguments>
         <hashTree />
         <ResultCollector enabled="true" guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
@@ -130,7 +133,7 @@
               <encoding>false</encoding>
               <assertions>false</assertions>
               <subresults>false</subresults>
-              <responseData>true</responseData>
+              <responseData>false</responseData>
               <samplerData>true</samplerData>
               <xml>false</xml>
               <fieldNames>true</fieldNames>
@@ -149,7 +152,7 @@
               <connectTime>true</connectTime>
             </value>
           </objProp>
-          <stringProp name="filename">${cwd}/static/Output/${out_cfg}/${out_cfg_new}_srvr${targetServer}_${num_Dittys}Dittys/results_tree.xml</stringProp>
+          <stringProp name="filename">./static/Output/${out_cfg}/${num_Dittys}Dittys/opt_NEW_srvr${targetServer_new}_${num_Dittys}Dittys/results_tree.csv</stringProp>
         </ResultCollector>
         <hashTree />
         <ResultCollector enabled="true" guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table">
@@ -188,7 +191,7 @@
               <connectTime>true</connectTime>
             </value>
           </objProp>
-          <stringProp name="filename">${cwd}/static/Output/${out_cfg}/${out_cfg_new}_srvr${targetServer_new}_${num_Dittys}Dittys/results_table.xml</stringProp>
+          <stringProp name="filename">./static/Output/${out_cfg}/${num_Dittys}Dittys/opt_NEW_srvr${targetServer_new}_${num_Dittys}Dittys/results_table.xml</stringProp>
         </ResultCollector>
         <hashTree />
         <CSVDataSet enabled="true" guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config">
@@ -288,7 +291,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">${num_Dittys}</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${thread_count}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">1</stringProp>
         <longProp name="ThreadGroup.start_time">1490375331000</longProp>
         <longProp name="ThreadGroup.end_time">1490375331000</longProp>
@@ -297,42 +300,6 @@
         <stringProp name="ThreadGroup.delay" />
       </ThreadGroup>
       <hashTree>
-        <Arguments enabled="true" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-          <collectionProp name="Arguments.arguments">
-            <elementProp elementType="Argument" name="cwd">
-              <stringProp name="Argument.name">cwd</stringProp>
-              <stringProp name="Argument.value">.</stringProp>
-              <stringProp name="Argument.desc">current test directory</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-            <elementProp elementType="Argument" name="out_cfg_old">
-              <stringProp name="Argument.name">out_cfg_old</stringProp>
-              <stringProp name="Argument.value">unopt_OLD</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-            <elementProp elementType="Argument" name="num_Dittys">
-              <stringProp name="Argument.name">num_Dittys</stringProp>
-              <stringProp name="Argument.value">5</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-            <elementProp elementType="Argument" name="targetServer_old">
-              <stringProp name="Argument.name">targetServer_old</stringProp>
-              <stringProp name="Argument.value">ec2-34-210-9-228.us-west-2.compute.amazonaws.com</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-            <elementProp elementType="Argument" name="targetPort">
-              <stringProp name="Argument.name">targetPort</stringProp>
-              <stringProp name="Argument.value">3000</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-            <elementProp elementType="Argument" name="apikey">
-              <stringProp name="Argument.name">apikey</stringProp>
-              <stringProp name="Argument.value">testkey</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-          </collectionProp>
-        </Arguments>
-        <hashTree />
         <HTTPSamplerProxy enabled="true" guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="MIXER4.1">
           <elementProp elementType="Arguments" enabled="true" guiclass="HTTPArgumentsPanel" name="HTTPsampler.Arguments" testclass="Arguments" testname="User Defined Variables">
             <collectionProp name="Arguments.arguments">
@@ -361,8 +328,8 @@
           </elementProp>
           <stringProp name="HTTPSampler.domain">${targetServer_old}</stringProp>
           <stringProp name="HTTPSampler.port">${targetPort}</stringProp>
-          <stringProp name="HTTPSampler.connect_timeout" />
-          <stringProp name="HTTPSampler.response_timeout" />
+          <stringProp name="HTTPSampler.connect_timeout">1000</stringProp>
+          <stringProp name="HTTPSampler.response_timeout">5000</stringProp>
           <stringProp name="HTTPSampler.protocol" />
           <stringProp name="HTTPSampler.contentEncoding" />
           <stringProp name="HTTPSampler.path">/song/play.mp4</stringProp>
@@ -374,6 +341,20 @@
           <boolProp name="HTTPSampler.monitor">false</boolProp>
           <stringProp name="HTTPSampler.embedded_url_re" />
         </HTTPSamplerProxy>
+        <hashTree />
+        <ConstantTimer enabled="true" guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="4.1Timer">
+          <stringProp name="ConstantTimer.delay">${request_delay}</stringProp>
+        </ConstantTimer>
+        <hashTree />
+        <Arguments enabled="true" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+          <collectionProp name="Arguments.arguments">
+            <elementProp elementType="Argument" name="targetServer_old">
+              <stringProp name="Argument.name">targetServer_old</stringProp>
+              <stringProp name="Argument.value">localhost</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+          </collectionProp>
+        </Arguments>
         <hashTree />
         <ResultCollector enabled="true" guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
@@ -392,7 +373,7 @@
               <encoding>false</encoding>
               <assertions>false</assertions>
               <subresults>false</subresults>
-              <responseData>true</responseData>
+              <responseData>false</responseData>
               <samplerData>true</samplerData>
               <xml>false</xml>
               <fieldNames>true</fieldNames>
@@ -411,7 +392,7 @@
               <connectTime>true</connectTime>
             </value>
           </objProp>
-          <stringProp name="filename">${cwd}/static/Output/${out_cfg}/${out_cfg_old}_srvr${targetServer}_${num_Dittys}Dittys/results_tree.xml</stringProp>
+          <stringProp name="filename">./static/Output/${out_cfg}/${num_Dittys}Dittys/unopt_OLD_srvr${targetServer_old}_${num_Dittys}Dittys/results_tree.csv</stringProp>
         </ResultCollector>
         <hashTree />
         <ResultCollector enabled="true" guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table">
@@ -450,7 +431,7 @@
               <connectTime>true</connectTime>
             </value>
           </objProp>
-          <stringProp name="filename">${cwd}/static/Output/${out_cfg}/${out_cfg_old}_srvr${targetServer_old}_${num_Dittys}Dittys/results_table.xml</stringProp>
+          <stringProp name="filename">./static/Output/${out_cfg}/${num_Dittys}Dittys/unopt_OLD_srvr${targetServer_old}_${num_Dittys}Dittys/results_table.xml</stringProp>
         </ResultCollector>
         <hashTree />
         <CSVDataSet enabled="true" guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config">
