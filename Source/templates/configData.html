@@ -8,7 +8,7 @@
     <h3>Past Datasets</h3>
     {% if datasets %}
       <table>
-      {% for key, value in datasets.iteritems() %}
+      {% for key, value in datasets.items() %}
         <tr>
            <td><a href="{{value}}">{{key}}</a></td>
            <td>

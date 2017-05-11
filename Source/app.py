@@ -7,7 +7,7 @@ import time
 import shutil
 import codecs
 import tweepy
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import itertools as itt
 import xml.etree.ElementTree as ET
 from werkzeug import secure_filename
@@ -25,6 +25,7 @@ app = Flask(__name__)
 
 ############ BASE CONFIG ###########
 JMETER = 'jmeter'
+jmeterLog = 'jmeter.log'
 workingDir = os.getcwd()
 CONFIG = workingDir + '/../JMeterConfig/config.jmx'
 outputDir = 'static/'
@@ -46,6 +47,21 @@ globalDataUsing = 'CSV_Data_File.csv'
 
 jMeterArgs = {}
 ############ BASE CONFIG ###########
+
+############ Init Folders ###########
+direc = 'static/Config'
+if not os.path.exists(direc):
+    os.makedirs(direc)
+
+direc = 'static/Data'
+if not os.path.exists(direc):
+    os.makedirs(direc)
+
+direc = 'static/Output'
+if not os.path.exists(direc):
+    os.makedirs(direc)
+
+############ Init Folders ###########
 
 # Homepage
 @app.route('/')
@@ -73,17 +89,32 @@ def executeTest():
 
     else:
         # Get test params
-        for arg,val in allParams.iteritems():
-            print arg
+        for arg,val in allParams.items():
+            print(arg)
             jMeterArgs[arg] = request.form[arg]
+
+        originalCFG = jMeterArgs['out_cfg']
+
+        timestr = time.strftime("%d-%m-%y_%H:%M:%S")
+        jMeterArgs['time_run'] = timestr
 
         # Check if running permutations
         runVars = request.form.get('RunVariations')
+        saltDataChk = request.form.get('SaltDataset')
+        if saltData:
+            saltDataText = request.form['SaltDatasetText']
+            saltData(saltDataText)
+            jMeterArgs['out_cfg'] += saltDataText
+
+            OUTPUT = 'static/Output/' + jMeterArgs['out_cfg']
+        else:
+            OUTPUT = 'static/Output/' + jMeterArgs['out_cfg']
+
         if runVars:
             runVariations()
         else:
             # Update configs values
-            print 'making conifg'
+            print('making conifg')
             tree = ET.parse(CONFIG)
             root = tree.getroot()
             for neighbor in root.iter('elementProp'):
@@ -92,22 +123,22 @@ def executeTest():
                         if child.attrib.get('name') == 'Argument.value':
                             currentArg = neighbor.attrib.get('name')
                             child.text = jMeterArgs[currentArg]
-                            print neighbor.attrib.get('name') + ' = ' + child.text
+                            print(neighbor.attrib.get('name') + ' = ' + child.text)
 
             tree.write(CONFIG)
 
             # prepare outut strings
-            timestr = time.strftime("%H%M%S")
-            OUTPUT = 'static/Output/' + timestr
-            OUTPUT += '_' + jMeterArgs['out_cfg']
-            OUTPUT += '_' + jMeterArgs['num_Dittys'] + 'Dittys'
-            # for arg, val in allParams.iteritems():
-            #     OUTPUT += '_' + arg[0] + jMeterArgs[arg]
+            OUTPUT += '/' + jMeterArgs['time_run']
+            OUTPUT += '/' + jMeterArgs['num_Dittys'] + 'Dittys'
 
-            OUTPUT_HTML = OUTPUT + '_HTML'
+            OUTPUT_HTML = OUTPUT + '/HTML'
             OUTPUTFile = OUTPUT + '.csv'
 
+            os.makedirs(OUTPUT_HTML)
+
             RunJMeter(CONFIG, OUTPUTFile, OUTPUT_HTML, True)
+
+            jMeterArgs['out_cfg'] = originalCFG
 
         return redirect(url_for('index'))
 
@@ -145,7 +176,7 @@ def configData():
 @app.route('/upload_jmx', methods=['GET','POST'])
 def upload_jmx():
     global allParams
-    print 'UPLOADING'
+    print('UPLOADING')
 
     if request.method == 'GET':
         allParams = GetNewJMX()
@@ -191,6 +222,11 @@ def upload_data():
         shutil.copy(f.filename, os.getcwd() + '/static/CSV_Data_File.csv')
 
     return redirect(url_for('configData'))
+
+@app.route('/log', methods=['GET'])
+def log():
+    logData = getLogData()
+    return render_template('Log.html',logData=logData)
 
 # Get all songs based on mic id
 def getAllSongs(micID):
@@ -273,8 +309,8 @@ def writeDataFile(pairs, micId, twitterUser, tweetCount):
     with open( csv_data_file_name, 'w' ) as csvfile:
         for p in pairs:
             t,s=p
-            text = urllib.quote_plus( t.encode('utf-8') )
-            song = s.encode('utf-8')
+            text = urllib.parse.quote_plus( t )
+            song = urllib.parse.quote_plus(s)
             text = re.sub(r"http\S+", "", text) # Remove http links
             if isNotBlank(text) and isNotBlank(song):
                 csvfile.write( text + "," + song + "\n" )
@@ -293,7 +329,7 @@ def runVariations ():
         jMeterArgs['useSubProcess'] = subproc
 
         if subproc == '0' and bypass == '0':
-            print 'Unneccessary run'
+            print('Unneccessary run')
         else:
             tree = ET.parse(CONFIG)
             root = tree.getroot()
@@ -303,7 +339,7 @@ def runVariations ():
                         if child.attrib.get('name') == 'Argument.value':
                             currentArg = neighbor.attrib.get('name')
                             child.text = jMeterArgs[currentArg]
-                            print neighbor.attrib.get('name') + ' = ' + child.text
+                            print(neighbor.attrib.get('name') + ' = ' + child.text)
 
             tree.write(CONFIG)
 
@@ -320,7 +356,7 @@ def runVariations ():
             # print JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML
             #
             # os.system(JMETER + ' -n -t ' + CONFIG + ' -l ' + OUTPUTFile + ' -e -o ' + OUTPUT_HTML)
-        print 'starting next permutation'
+        print('starting next permutation')
 
 # Updates the dictionary that holds the test parameters
 def GetNewJMX():
@@ -336,22 +372,52 @@ def GetNewJMX():
     return allParams
 
 def RunJMeter(configPath, outputFile, outputHTML, asDaemon):
-    cmd = JMETER + ' -n -t ' + configPath + ' -l ' +outputFile + ' -e -o ' + outputHTML
+    print (outputFile)
+    zipDir = outputFile[:-4]
+    print (' && zip -r ' + zipDir + '.zip ' + zipDir)
+    cmd = JMETER + ' -n -t ' + configPath + ' -l ' +outputFile + ' -e -o ' + outputHTML + ' && zip -r ' + zipDir + '.zip ' + zipDir
 
     if asDaemon:
         cmd = cmd + ' &'
 
     # Run jmeter command
-    print cmd
-
+    print(cmd)
     os.system(cmd)
 
 def GetSummaries():
+    list_summaries = []
     summaries = {}
-    for outFile in glob.iglob('static/Output/**/*.html'):
+    for outFile in glob.iglob('static/Output/**/HTML/index.html', recursive=True):
+        summaries = {}
         outKey = outFile[14:]
-        summaries[outKey] = '/' + outFile
-    return summaries
+        zipFile = ''
+        for fl in glob.iglob(outFile[:40]+'*/**/*.zip', recursive=True):
+            zipFile = fl
+
+        for overallFL in glob.iglob(outFile[:40]+'*/*.csv', recursive=True):
+            overallCSV = overallFL
+            summaries['overall'] = overallCSV
+
+        for newFL in glob.iglob(outFile[:40]+'*/**/opt*/*.csv', recursive=True):
+            newCSV = newFL
+            summaries['new'] = newCSV
+
+        for oldFL in glob.iglob(outFile[:40]+'*/**/unopt*/*.csv', recursive=True):
+            oldCSV = oldFL
+            summaries['old'] = oldCSV
+
+        summaries['zip'] = zipFile
+
+        reportPath = '/' + outFile
+        summaries['report'] = reportPath
+
+        lastColon = outFile.rfind(':')
+        description = outFile[:lastColon+3].replace('static/Output/','').replace('/',' Run on: ')
+        summaries['description'] = description
+
+        list_summaries.append(summaries)
+
+    return list_summaries
 
 def GetDatasets():
     datasets = {}
@@ -359,6 +425,52 @@ def GetDatasets():
         outKey = outFile[12:]
         datasets[outKey] = '/' + outFile
     return datasets
+
+def getLogData():
+    logData = []
+    if os.path.exists(jmeterLog):
+        with open(jmeterLog, 'r') as logFile:
+            logData = logFile.readlines()
+
+
+    return reversed(logData)
+
+def saltData(saltText):
+    global globalDataUsing
+    dataFile = globalDataUsing
+
+    dataset = open(dataFile , 'r')
+
+    newLines = []
+    for line in dataset:
+        cols = line.split(',')
+        cols[0] = re.sub('(?<=\*)(.*?)(?=\*)',saltText, cols[0])
+        newLines.append(cols[0] + ',' + cols[1])
+    dataset.close()
+
+    #clear out file
+    open(dataFile,'w').close()
+
+    newDataset = open(dataFile , 'w')
+    for line in newLines:
+        newDataset.write(line)
+    newDataset.close()
+
+    return
+
+def make_tree(path):
+    tree = dict(name=path, children=[])
+    try: lst = os.listdir(path)
+    except OSError:
+        pass #ignore errors
+    else:
+        for name in lst:
+            fn = os.path.join(path, name)
+            if os.path.isdir(fn):
+                tree['children'].append(make_tree(fn))
+            else:
+                tree['children'].append(dict(name=fn))
+    return tree
 
 # Checks if string is not blank or empty
 def isNotBlank (myString):

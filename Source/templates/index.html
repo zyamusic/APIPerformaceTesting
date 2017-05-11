@@ -4,13 +4,20 @@
   <div class=main>
     <h1>Summary Reports</h1>
     {% if summaries %}
+    <div class=log>
       <table>
-      {% for key, value in summaries.iteritems() %}
-        <tr>
-           <td><a href="{{value}}">{{key}}</a></td>
-        </tr>
-      {% endfor %}
+        {% for summary in summaries %}
+            <tr>
+               <td><p>{{ summary['description'] }}</p></td>
+               <td><a href="{{summary['zip']}}">Artifacts</a></td>
+               <td><a href="{{summary['report']}}">HTML Report</a></td>
+               <td><a href="{{summary['overall']}}">Overall</a></td>
+               <td><a href="{{summary['old']}}">Old</a></td>
+               <td><a href="{{summary['new']}}">New</a></td>
+            </tr>
+          {% endfor %}
       </table>
+    </div>
       {% else %}
         No Summaries.
     {% endif %}
@@ -23,24 +30,49 @@
     <form action="executeTest" method="post">
       <table>
         <tbody>
-          {% for key, val in allParams.iteritems() %}
+          {% for key, val in allParams.items() %}
+            {%if key != "time_run" %}
+              <tr>
+                <td>
+                  {{key}}:
+                </td>
+                <td>
+                  <input type="text" name="{{key}}" value="{{val}}">
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td>
+                </td>
+                <td>
+                  <input type="text" name="{{key}}" value="{{val}}" hidden="true">
+                </td>
+              </tr>
+            {% endif %}
+
+          {% endfor %}
           <tr>
             <td>
-              {{key}}:
+              Salt Data:
             </td>
             <td>
-              <input type="text" name="{{key}}" value="{{val}}">
+              <input type="text" name="SaltDatasetText" value="swag">
             </td>
           </tr>
-          {% endfor %}
           <tr>
             <td>
               <input class=btn type="submit" value="Submit">
             </td>
             <td>
+              Salt Dataset
+              <input type="checkbox" name="SaltDataset" checked="true">
+            </td>
+            <!--
+            <td>
               Run Variations
               <input type="checkbox" name="RunVariations">
             </td>
+            -->
           </tr>
         </tbody>
       </table>
