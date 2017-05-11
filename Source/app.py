@@ -48,6 +48,21 @@ globalDataUsing = 'CSV_Data_File.csv'
 jMeterArgs = {}
 ############ BASE CONFIG ###########
 
+############ Init Folders ###########
+direc = 'static/Config'
+if not os.path.exists(direc):
+    os.makedirs(direc)
+
+direc = 'static/Data'
+if not os.path.exists(direc):
+    os.makedirs(direc)
+
+direc = 'static/Output'
+if not os.path.exists(direc):
+    os.makedirs(direc)
+
+############ Init Folders ###########
+
 # Homepage
 @app.route('/')
 @app.route('/index')
@@ -58,8 +73,6 @@ def index():
 
     # display all summary files
     summaries = GetSummaries()
-
-    #saltData()
 
     return render_template('index.html', summaries=summaries, allParams=allParams,currentDataset=globalDataUsing)
 
@@ -80,8 +93,10 @@ def executeTest():
             print(arg)
             jMeterArgs[arg] = request.form[arg]
 
-        timestr = time.strftime("%d-%m-%y_%H:%M:%S")
+        originalCFG = jMeterArgs['out_cfg']
 
+        timestr = time.strftime("%d-%m-%y_%H:%M:%S")
+        jMeterArgs['time_run'] = timestr
 
         # Check if running permutations
         runVars = request.form.get('RunVariations')
@@ -89,14 +104,11 @@ def executeTest():
         if saltData:
             saltDataText = request.form['SaltDatasetText']
             saltData(saltDataText)
-            jMeterArgs['out_cfg'] += saltDataText + '/'
-            jMeterArgs['out_cfg'] += timestr + '/'
+            jMeterArgs['out_cfg'] += saltDataText
+
             OUTPUT = 'static/Output/' + jMeterArgs['out_cfg']
         else:
-            jMeterArgs['out_cfg'] += timestr + '/'
             OUTPUT = 'static/Output/' + jMeterArgs['out_cfg']
-
-
 
         if runVars:
             runVariations()
@@ -116,19 +128,17 @@ def executeTest():
             tree.write(CONFIG)
 
             # prepare outut strings
-
-            OUTPUT += jMeterArgs['num_Dittys'] + 'Dittys'
-            #OUTPUT = 'static/Output/' + timestr
-            #OUTPUT += '_' + jMeterArgs['out_cfg']
-            #OUTPUT += '_' + jMeterArgs['num_Dittys'] + 'Dittys'
-            # for arg, val in allParams.iteritems():
-            #     OUTPUT += '_' + arg[0] + jMeterArgs[arg]
+            OUTPUT += '/' + jMeterArgs['time_run']
+            OUTPUT += '/' + jMeterArgs['num_Dittys'] + 'Dittys'
 
             OUTPUT_HTML = OUTPUT + '/HTML'
             OUTPUTFile = OUTPUT + '.csv'
+
             os.makedirs(OUTPUT_HTML)
 
             RunJMeter(CONFIG, OUTPUTFile, OUTPUT_HTML, True)
+
+            jMeterArgs['out_cfg'] = originalCFG
 
         return redirect(url_for('index'))
 
@@ -216,7 +226,6 @@ def upload_data():
 @app.route('/log', methods=['GET'])
 def log():
     logData = getLogData()
-
     return render_template('Log.html',logData=logData)
 
 # Get all songs based on mic id
@@ -373,7 +382,6 @@ def RunJMeter(configPath, outputFile, outputHTML, asDaemon):
 
     # Run jmeter command
     print(cmd)
-
     os.system(cmd)
 
 def GetSummaries():
@@ -382,40 +390,33 @@ def GetSummaries():
     for outFile in glob.iglob('static/Output/**/HTML/index.html', recursive=True):
         summaries = {}
         outKey = outFile[14:]
-        print (outFile[:40])
+        zipFile = ''
         for fl in glob.iglob(outFile[:40]+'*/**/*.zip', recursive=True):
             zipFile = fl
 
         for overallFL in glob.iglob(outFile[:40]+'*/*.csv', recursive=True):
             overallCSV = overallFL
-            print(overallCSV)
             summaries['overall'] = overallCSV
 
         for newFL in glob.iglob(outFile[:40]+'*/**/opt*/*.csv', recursive=True):
             newCSV = newFL
-            print(newCSV)
             summaries['new'] = newCSV
 
         for oldFL in glob.iglob(outFile[:40]+'*/**/unopt*/*.csv', recursive=True):
             oldCSV = oldFL
-            print(oldCSV)
             summaries['old'] = oldCSV
 
-        zipPath = outFile[:14] + zipFile
         summaries['zip'] = zipFile
 
         reportPath = '/' + outFile
         summaries['report'] = reportPath
 
         lastColon = outFile.rfind(':')
-        print ('LAST COLON + ' + str(lastColon))
-
         description = outFile[:lastColon+3].replace('static/Output/','').replace('/',' Run on: ')
         summaries['description'] = description
 
         list_summaries.append(summaries)
 
-        #summaries[outKey] = '/' + outFile
     return list_summaries
 
 def GetDatasets():
@@ -430,7 +431,9 @@ def getLogData():
     if os.path.exists(jmeterLog):
         with open(jmeterLog, 'r') as logFile:
             logData = logFile.readlines()
-    return logData
+
+
+    return reversed(logData)
 
 def saltData(saltText):
     global globalDataUsing
@@ -444,6 +447,9 @@ def saltData(saltText):
         cols[0] = re.sub('(?<=\*)(.*?)(?=\*)',saltText, cols[0])
         newLines.append(cols[0] + ',' + cols[1])
     dataset.close()
+
+    #clear out file
+    open(dataFile,'w').close()
 
     newDataset = open(dataFile , 'w')
     for line in newLines:
