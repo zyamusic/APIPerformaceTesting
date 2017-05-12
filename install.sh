@@ -20,11 +20,11 @@ else
     pip3 install virtualenv
 fi
 
-if [ -d ~/.envs/APIPerf3.5 ]; then
-  echo "~/.envs/APIPerf3.5 found"
+if [ -d ~/.envs/APIPerf3 ]; then
+  echo "~/.envs/APIPerf3 found"
 else
-  echo "~/.envs/APIPerf3.5 not found"
-  virtualenv -p python3 ~/.envs/APIPerf3.5
+  echo "Creating ~/.envs/APIPerf3.5 with virtual environment"
+  virtualenv -p python3 ~/.envs/APIPerf3
 fi
 
 if [ ${VIRTUAL_ENV} ]
@@ -53,8 +53,8 @@ fi
 if [ -f ~/repos/APIPerformaceTesting/Source/keys.txt ]; then
   echo "keys.txt found"
 else
-  echo "keys.txt not found, ask Russell for the keys to Twitter"
-  exit
+  echo "keys.txt not found, ask Russell for the keys to Twitter to generate datasets using twitter feeds"
+  touch ~/repos/APIPerformaceTesting/Source/keys.txt
 fi
 
 if [ -d ~/repos/DittyAudioContent ]; then
