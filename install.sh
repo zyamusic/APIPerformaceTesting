@@ -53,7 +53,7 @@ fi
 if [ -f ~/repos/APIPerformaceTesting/Source/keys.txt ]; then
   echo "keys.txt found"
 else
-  echo "keys.txt not found"
+  echo "keys.txt not found, ask Russell for the keys to Twitter"
   exit
 fi
 
@@ -64,6 +64,8 @@ else
   echo "run git clone https://github.com/zyamusic/DittyAudioContent.git and provide your credentials"
 fi
 
+echo "Starting server install"
 cd ~/repos/APIPerformaceTesting/Source
 pip install -r requirements.txt
 python app.py &
+echo "Server Running"
