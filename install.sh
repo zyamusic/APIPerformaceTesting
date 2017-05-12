@@ -23,7 +23,7 @@ fi
 if [ -d ~/.envs/APIPerf3 ]; then
   echo "~/.envs/APIPerf3 found"
 else
-  echo "Creating ~/.envs/APIPerf3.5 with virtual environment"
+  echo "Creating ~/.envs/APIPerf3 with virtual environment"
   virtualenv -p python3 ~/.envs/APIPerf3
 fi
 
@@ -31,7 +31,7 @@ if [ ${VIRTUAL_ENV} ]
     then
         "Virtual environment found"
     else
-      "Virtual environment not found, please source ~/.envs/APIPerf3.5/bin/activate"
+      "Virtual environment not found, please source ~/.envs/APIPerf3/bin/activate"
       exit
 fi
 
