@@ -44,6 +44,8 @@ SubprocOptions = ['0','1']
 globalSelectedMic = 'all'
 globalTwitterUser = 'theRealDonaldTrump'
 globalDataUsing = 'CSV_Data_File.csv'
+globalDataUsingForward = 'CSV_Data_FileForward.csv'
+globalDataUsingReverse = 'CSV_Data_FileRevese.csv'
 
 jMeterArgs = {}
 ############ BASE CONFIG ###########
@@ -444,17 +446,22 @@ def saltData(saltText):
     newLines = []
     for line in dataset:
         cols = line.split(',')
-        cols[0] = re.sub('(?<=\*)(.*?)(?=\*)',saltText, cols[0])
-        newLines.append(cols[0] + ',' + cols[1])
+        salted = re.sub('(?<=\*)(.*?)(?=\*)',saltText, cols[0])
+        newLines.append(salted + ',' + cols[1])
     dataset.close()
 
     #clear out file
-    open(dataFile,'w').close()
+    #open(dataFile,'w').close()
 
-    newDataset = open(dataFile , 'w')
+    forward = open(globalDataUsingForward , 'w')
     for line in newLines:
-        newDataset.write(line)
-    newDataset.close()
+        forward.write(line)
+    forward.close()
+
+    reverse = open(globalDataUsingReverse , 'w')
+    for line in reversed(newLines):
+        reverse.write(line)
+    reverse.close()
 
     return
 

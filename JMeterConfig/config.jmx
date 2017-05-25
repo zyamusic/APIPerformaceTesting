@@ -14,7 +14,7 @@
         <collectionProp name="Arguments.arguments">
           <elementProp elementType="Argument" name="out_cfg">
             <stringProp name="Argument.name">out_cfg</stringProp>
-            <stringProp name="Argument.value">ayyyylmao</stringProp>
+            <stringProp name="Argument.value">ayyyylmaoswagswag</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp elementType="Argument" name="request_delay">
@@ -24,12 +24,12 @@
           </elementProp>
           <elementProp elementType="Argument" name="num_Dittys">
             <stringProp name="Argument.name">num_Dittys</stringProp>
-            <stringProp name="Argument.value">50</stringProp>
+            <stringProp name="Argument.value">5</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp elementType="Argument" name="thread_count">
             <stringProp name="Argument.name">thread_count</stringProp>
-            <stringProp name="Argument.value">2</stringProp>
+            <stringProp name="Argument.value">4</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp elementType="Argument" name="targetPort">
@@ -39,7 +39,17 @@
           </elementProp>
           <elementProp elementType="Argument" name="time_run">
             <stringProp name="Argument.name">time_run</stringProp>
-            <stringProp name="Argument.value">11-05-17_13:39:46</stringProp>
+            <stringProp name="Argument.value">25-05-17_11:25:39</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp elementType="Argument" name="label_new">
+            <stringProp name="Argument.name">label_new</stringProp>
+            <stringProp name="Argument.value">Sox_On</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp elementType="Argument" name="label_old">
+            <stringProp name="Argument.name">label_old</stringProp>
+            <stringProp name="Argument.value">Sox_Off</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -60,7 +70,7 @@
         <stringProp name="ThreadGroup.delay" />
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy enabled="true" guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="MIXER4.2">
+        <HTTPSamplerProxy enabled="true" guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="${label_new}">
           <elementProp elementType="Arguments" enabled="true" guiclass="HTTPArgumentsPanel" name="HTTPsampler.Arguments" testclass="Arguments" testname="User Defined Variables">
             <collectionProp name="Arguments.arguments">
               <elementProp elementType="HTTPArgument" name="text">
@@ -88,8 +98,8 @@
           </elementProp>
           <stringProp name="HTTPSampler.domain">${targetServer_new}</stringProp>
           <stringProp name="HTTPSampler.port">${targetPort}</stringProp>
-          <stringProp name="HTTPSampler.connect_timeout">1000</stringProp>
-          <stringProp name="HTTPSampler.response_timeout">5000</stringProp>
+          <stringProp name="HTTPSampler.connect_timeout" />
+          <stringProp name="HTTPSampler.response_timeout" />
           <stringProp name="HTTPSampler.protocol" />
           <stringProp name="HTTPSampler.contentEncoding" />
           <stringProp name="HTTPSampler.path">/song/play.mp4</stringProp>
@@ -110,7 +120,7 @@
           <collectionProp name="Arguments.arguments">
             <elementProp elementType="Argument" name="targetServer_new">
               <stringProp name="Argument.name">targetServer_new</stringProp>
-              <stringProp name="Argument.value">ec2-54-186-86-131.us-west-2.compute.amazonaws.com</stringProp>
+              <stringProp name="Argument.value">localhost1</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
             <elementProp elementType="Argument" name="apikey_new">
@@ -199,17 +209,6 @@
           <stringProp name="filename">./static/Output/${out_cfg}/${time_run}/${num_Dittys}Dittys/opt_NEW_srvr${targetServer_new}_${num_Dittys}Dittys/results_table.xml</stringProp>
         </ResultCollector>
         <hashTree />
-        <CSVDataSet enabled="true" guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config">
-          <stringProp name="delimiter">,</stringProp>
-          <stringProp name="fileEncoding" />
-          <stringProp name="filename">CSV_Data_File.csv</stringProp>
-          <boolProp name="quotedData">true</boolProp>
-          <boolProp name="recycle">true</boolProp>
-          <stringProp name="shareMode">shareMode.all</stringProp>
-          <boolProp name="stopThread">false</boolProp>
-          <stringProp name="variableNames">text,song</stringProp>
-        </CSVDataSet>
-        <hashTree />
         <ResultCollector enabled="false" guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
@@ -289,6 +288,17 @@
           <stringProp name="RespTimeGraph.graphsizeheight">480</stringProp>
         </ResultCollector>
         <hashTree />
+        <CSVDataSet enabled="true" guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config">
+          <stringProp name="delimiter">,</stringProp>
+          <stringProp name="fileEncoding" />
+          <stringProp name="filename">CSV_Data_FileForward.csv</stringProp>
+          <boolProp name="quotedData">true</boolProp>
+          <boolProp name="recycle">true</boolProp>
+          <stringProp name="shareMode">shareMode.all</stringProp>
+          <boolProp name="stopThread">false</boolProp>
+          <stringProp name="variableNames">text,song</stringProp>
+        </CSVDataSet>
+        <hashTree />
       </hashTree>
       <ThreadGroup enabled="true" guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group_Old">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
@@ -305,7 +315,7 @@
         <stringProp name="ThreadGroup.delay" />
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy enabled="true" guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="MIXER4.1">
+        <HTTPSamplerProxy enabled="true" guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="${label_old}">
           <elementProp elementType="Arguments" enabled="true" guiclass="HTTPArgumentsPanel" name="HTTPsampler.Arguments" testclass="Arguments" testname="User Defined Variables">
             <collectionProp name="Arguments.arguments">
               <elementProp elementType="HTTPArgument" name="text">
@@ -333,8 +343,8 @@
           </elementProp>
           <stringProp name="HTTPSampler.domain">${targetServer_old}</stringProp>
           <stringProp name="HTTPSampler.port">${targetPort}</stringProp>
-          <stringProp name="HTTPSampler.connect_timeout">1000</stringProp>
-          <stringProp name="HTTPSampler.response_timeout">5000</stringProp>
+          <stringProp name="HTTPSampler.connect_timeout" />
+          <stringProp name="HTTPSampler.response_timeout" />
           <stringProp name="HTTPSampler.protocol" />
           <stringProp name="HTTPSampler.contentEncoding" />
           <stringProp name="HTTPSampler.path">/song/play.mp4</stringProp>
@@ -355,7 +365,7 @@
           <collectionProp name="Arguments.arguments">
             <elementProp elementType="Argument" name="targetServer_old">
               <stringProp name="Argument.name">targetServer_old</stringProp>
-              <stringProp name="Argument.value">ec2-54-245-189-164.us-west-2.compute.amazonaws.com</stringProp>
+              <stringProp name="Argument.value">localhost2</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
             <elementProp elementType="Argument" name="apikey_old">
@@ -444,17 +454,6 @@
           <stringProp name="filename">./static/Output/${out_cfg}/${time_run}/${num_Dittys}Dittys/unopt_OLD_srvr${targetServer_old}_${num_Dittys}Dittys/results_table.xml</stringProp>
         </ResultCollector>
         <hashTree />
-        <CSVDataSet enabled="true" guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config">
-          <stringProp name="delimiter">,</stringProp>
-          <stringProp name="fileEncoding" />
-          <stringProp name="filename">CSV_Data_File.csv</stringProp>
-          <boolProp name="quotedData">true</boolProp>
-          <boolProp name="recycle">true</boolProp>
-          <stringProp name="shareMode">shareMode.all</stringProp>
-          <boolProp name="stopThread">false</boolProp>
-          <stringProp name="variableNames">text,song</stringProp>
-        </CSVDataSet>
-        <hashTree />
         <ResultCollector enabled="false" guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
@@ -533,6 +532,17 @@
           <stringProp name="RespTimeGraph.graphsizewidth">640</stringProp>
           <stringProp name="RespTimeGraph.graphsizeheight">480</stringProp>
         </ResultCollector>
+        <hashTree />
+        <CSVDataSet enabled="true" guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config">
+          <stringProp name="delimiter">,</stringProp>
+          <stringProp name="fileEncoding" />
+          <stringProp name="filename">CSV_Data_FileReverse.csv</stringProp>
+          <boolProp name="quotedData">true</boolProp>
+          <boolProp name="recycle">true</boolProp>
+          <stringProp name="shareMode">shareMode.all</stringProp>
+          <boolProp name="stopThread">false</boolProp>
+          <stringProp name="variableNames">text,song</stringProp>
+        </CSVDataSet>
         <hashTree />
       </hashTree>
     </hashTree>
