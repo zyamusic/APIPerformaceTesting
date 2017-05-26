@@ -15,7 +15,7 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="out_cfg" elementType="Argument">
             <stringProp name="Argument.name">out_cfg</stringProp>
-            <stringProp name="Argument.value">ayyyylmao</stringProp>
+            <stringProp name="Argument.value">replace_every_run</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="request_delay" elementType="Argument">
@@ -30,7 +30,7 @@
           </elementProp>
           <elementProp name="thread_count" elementType="Argument">
             <stringProp name="Argument.name">thread_count</stringProp>
-            <stringProp name="Argument.value">8</stringProp>
+            <stringProp name="Argument.value">4</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="targetPort" elementType="Argument">
@@ -71,7 +71,7 @@
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="${label_new}" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="BS5_SP_BPO_Sox_ON" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments">
               <elementProp name="text" elementType="HTTPArgument">
@@ -295,7 +295,7 @@
           <stringProp name="filename">CSV_Data_FileForward.csv</stringProp>
           <boolProp name="quotedData">true</boolProp>
           <boolProp name="recycle">true</boolProp>
-          <stringProp name="shareMode">shareMode.all</stringProp>
+          <stringProp name="shareMode">shareMode.group</stringProp>
           <boolProp name="stopThread">false</boolProp>
           <stringProp name="variableNames">text,song</stringProp>
         </CSVDataSet>
@@ -316,7 +316,7 @@
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="${label_old}" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Old_Prod" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments">
               <elementProp name="text" elementType="HTTPArgument">
@@ -540,7 +540,7 @@
           <stringProp name="filename">CSV_Data_FileReverse.csv</stringProp>
           <boolProp name="quotedData">true</boolProp>
           <boolProp name="recycle">true</boolProp>
-          <stringProp name="shareMode">shareMode.all</stringProp>
+          <stringProp name="shareMode">shareMode.group</stringProp>
           <boolProp name="stopThread">false</boolProp>
           <stringProp name="variableNames">text,song</stringProp>
         </CSVDataSet>
