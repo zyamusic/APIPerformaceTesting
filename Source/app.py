@@ -6,7 +6,7 @@ import json
 import time
 import shutil
 import codecs
-import tweepy
+# import tweepy
 import urllib.request, urllib.parse, urllib.error
 import itertools as itt
 import xml.etree.ElementTree as ET
@@ -14,11 +14,11 @@ from werkzeug import secure_filename
 from flask import Flask,render_template, redirect, url_for, request
 
 ###########TWITTER
-keyFile = open('keys.txt', 'r')
-consumer_key = keyFile.readline().rstrip()
-consumer_secret = keyFile.readline().rstrip()
-access_key = keyFile.readline().rstrip()
-access_secret = keyFile.readline().rstrip()
+# keyFile = open('keys.txt', 'r')
+# consumer_key = keyFile.readline().rstrip()
+# consumer_secret = keyFile.readline().rstrip()
+# access_key = keyFile.readline().rstrip()
+# access_secret = keyFile.readline().rstrip()
 ###########TWITTER
 
 app = Flask(__name__)
@@ -37,15 +37,16 @@ allParams = {
     'bypassOGGEncoding':0, 'useSubProcess':0
 }
 
-shiftOptions = ['4', '5','6','7','8']
-threadedOptions = ['0','1']
-bypassOptions = ['0','1']
-SubprocOptions = ['0','1']
-globalSelectedMic = 'all'
-globalTwitterUser = 'theRealDonaldTrump'
-globalDataUsing = 'CSV_Data_File.csv'
+shiftOptions           = ['4', '5','6','7','8']
+threadedOptions        = ['0','1']
+bypassOptions          = ['0','1']
+SubprocOptions         = ['0','1']
+globalSelectedMic      = 'all'
+globalTwitterUser      = 'theRealDonaldTrump'
+globalDataUsing        = 'CSV_Data_File.csv'
 globalDataUsingForward = 'CSV_Data_FileForward.csv'
-globalDataUsingReverse = 'CSV_Data_FileRevese.csv'
+globalDataUsingReverse = 'CSV_Data_FileReverse.csv'
+saltDataText           = 'swag'
 
 jMeterArgs = {}
 ############ BASE CONFIG ###########
@@ -76,13 +77,15 @@ def index():
     # display all summary files
     summaries = GetSummaries()
 
-    return render_template('index.html', summaries=summaries, allParams=allParams,currentDataset=globalDataUsing)
+    return render_template('index.html', summaries=summaries, allParams=allParams,currentDataset=globalDataUsing,saltDataText=saltDataText)
 
 # Testing area
 @app.route('/executeTest', methods=['GET','POST'])
 def executeTest():
     global OUTPUT
     global allParams
+    global globalDataUsing
+    global saltDataText
     if request.method == 'GET':
         allParams = GetNewJMX()
         summaries = GetSummaries()
@@ -105,7 +108,9 @@ def executeTest():
         saltDataChk = request.form.get('SaltDataset')
         if saltData:
             saltDataText = request.form['SaltDatasetText']
-            saltData(saltDataText)
+            # find out how many rows are needed and provide them to the salter
+            numLines = 2 * int( jMeterArgs['num_Dittys'], 10 ) * 4 # int( jMeterArgs['thread_count'], 10 )
+            saltData(saltDataText, numLines )
             jMeterArgs['out_cfg'] += saltDataText
 
             OUTPUT = 'static/Output/' + jMeterArgs['out_cfg']
@@ -261,44 +266,44 @@ def getAllMicIDs():
 
 # Get a specified number of tweets from a twitter user
 def getAllTweets(screen_name, tweetCount):
-    tweetCount = int(tweetCount)
+    # tweetCount = int(tweetCount)
     tweetText = []
-    #Twitter only allows access to a users most recent 3240 tweets with this method
+    # #Twitter only allows access to a users most recent 3240 tweets with this method
 
-    #authorize twitter, initialize tweepy
-    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-    auth.set_access_token(access_key, access_secret)
-    api = tweepy.API(auth)
+    # #authorize twitter, initialize tweepy
+    # auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    # auth.set_access_token(access_key, access_secret)
+    # api = tweepy.API(auth)
 
     #initialize a list to hold all the tweepy Tweets
-    alltweets = []
+    # alltweets = []
 
     #make initial request for most recent tweets (200 is the maximum allowed count)
-    if tweetCount > 200:
-        new_tweets = api.user_timeline(screen_name = screen_name,count=200)
-        #save most recent tweets
-        alltweets.extend(new_tweets)
-        oldest = alltweets[-1].id - 1
+    # if tweetCount > 200:
+    #     new_tweets = api.user_timeline(screen_name = screen_name,count=200)
+    #     #save most recent tweets
+    #     alltweets.extend(new_tweets)
+    #     oldest = alltweets[-1].id - 1
 
-        #keep grabbing tweets until there are no tweets left to grab
-        while len(new_tweets) > 0 and len(alltweets) < tweetCount:
+    #     #keep grabbing tweets until there are no tweets left to grab
+    #     while len(new_tweets) > 0 and len(alltweets) < tweetCount:
 
-            #all subsiquent requests use the max_id param to prevent duplicates
-            new_tweets = api.user_timeline(screen_name = screen_name,count=200,max_id=oldest)
+    #         #all subsiquent requests use the max_id param to prevent duplicates
+    #         new_tweets = api.user_timeline(screen_name = screen_name,count=200,max_id=oldest)
 
-            #save most recent tweets
-            alltweets.extend(new_tweets)
+    #         #save most recent tweets
+    #         alltweets.extend(new_tweets)
 
-            #update the id of the oldest tweet less one
-            oldest = alltweets[-1].id - 1
+    #         #update the id of the oldest tweet less one
+    #         oldest = alltweets[-1].id - 1
 
-    else:
-        new_tweets = api.user_timeline(screen_name = screen_name,count=tweetCount)
-        alltweets.extend(new_tweets)
+    # else:
+    #     new_tweets = api.user_timeline(screen_name = screen_name,count=tweetCount)
+    #     alltweets.extend(new_tweets)
 
-    for tweet in alltweets:
-        if len(tweetText) <= tweetCount:
-            tweetText.append(tweet.text)
+    # for tweet in alltweets:
+    #     if len(tweetText) <= tweetCount:
+    #         tweetText.append(tweet.text)
     return tweetText
 
 # Writes the dataset of (text,song)
@@ -371,7 +376,7 @@ def GetNewJMX():
                 if child.attrib.get('name') == 'Argument.value':
                     currentArg = neighbor.attrib.get('name')
                     allParams[currentArg] = child.text
-    return allParams
+    return allParams #adfadsf adsfasdfadsfadfssasdf
 
 def RunJMeter(configPath, outputFile, outputHTML, asDaemon):
     print (outputFile)
@@ -387,37 +392,57 @@ def RunJMeter(configPath, outputFile, outputHTML, asDaemon):
     os.system(cmd)
 
 def GetSummaries():
+    print( "GettingSummaries" )
     list_summaries = []
     summaries = {}
-    for outFile in glob.iglob('static/Output/**/HTML/index.html', recursive=True):
-        summaries = {}
-        outKey = outFile[14:]
-        zipFile = ''
-        for fl in glob.iglob(outFile[:40]+'*/**/*.zip', recursive=True):
-            zipFile = fl
+    indexfiles = glob.glob('static/Output/**/HTML/index.html', recursive=True )
+    print( " found " + str( len( indexfiles ) ) + " indexfiles" )
+    os.system( 'pwd' )
+    outFiles = sorted( indexfiles, key=os.path.getmtime, reverse=True )
+    print( " found " + str( len( outFiles ) ) + " outFiles" )
+    if outFiles is not None:
+        print( "found outFiles" )
+        for outFile in outFiles:
+            parts = outFile.split('/') # os.pathsep
+            # static/Output/goodbye_LavNam/25-05-17_17:05:11/100Dittys/uno
+            part_lengths = list( map( len, parts ) )
+            pals = zip( part_lengths, list( parts ))
+            print( list( pals ) )
 
-        for overallFL in glob.iglob(outFile[:40]+'*/*.csv', recursive=True):
-            overallCSV = overallFL
-            summaries['overall'] = overallCSV
+            stop_At = sum( part_lengths[:4] )
+            print ("stop_At " + str( stop_At ) )
+            summaries = {}
+            print( "now Procesing:" + outFile )
+            # outKey = outFile[14:] # Magic numbers 
+            print ( "prefix = " + outFile[:stop_At] )
+            zipFile = ''
+            for fl in glob.iglob(outFile[:stop_At]+'*/**/*.zip', recursive=True):
+                zipFile = fl # why the loop? we should be able to just get the file directly
 
-        for newFL in glob.iglob(outFile[:40]+'*/**/opt*/*.csv', recursive=True):
-            newCSV = newFL
-            summaries['new'] = newCSV
+            for overallFL in glob.iglob(outFile[:stop_At]+'*/*.csv', recursive=True):
+                overallCSV = overallFL
+                summaries['overall'] = overallCSV
 
-        for oldFL in glob.iglob(outFile[:40]+'*/**/unopt*/*.csv', recursive=True):
-            oldCSV = oldFL
-            summaries['old'] = oldCSV
+            for newFL in glob.iglob(outFile[:stop_At]+'*/**/opt*/*.csv', recursive=True):
+                newCSV = newFL
+                summaries['new'] = newCSV
 
-        summaries['zip'] = zipFile
+            for oldFL in glob.iglob(outFile[:stop_At]+'*/**/unopt*/*.csv', recursive=True):
 
-        reportPath = '/' + outFile
-        summaries['report'] = reportPath
+                oldCSV = oldFL
+                summaries['old'] = oldCSV
 
-        lastColon = outFile.rfind(':')
-        description = outFile[:lastColon+3].replace('static/Output/','').replace('/',' Run on: ')
-        summaries['description'] = description
+            summaries['zip'] = zipFile
 
-        list_summaries.append(summaries)
+            reportPath = '/' + outFile
+            summaries['report'] = reportPath
+
+            lastColon = outFile.rfind(':')
+            description , run_on = outFile[:lastColon+3].replace('static/Output/','').split('/')            
+            summaries['description'] = description
+            summaries['run_on'] = run_on 
+
+            list_summaries.append(summaries)
 
     return list_summaries
 
@@ -437,14 +462,17 @@ def getLogData():
 
     return reversed(logData)
 
-def saltData(saltText):
+def saltData(saltText, numLines = -1 ):
     global globalDataUsing
     dataFile = globalDataUsing
 
     dataset = open(dataFile , 'r')
 
     newLines = []
-    for line in dataset:
+    for idx,line in enumerate( dataset ):
+        if ( -1 != numLines and idx >= numLines ):
+            break
+
         cols = line.split(',')
         salted = re.sub('(?<=\*)(.*?)(?=\*)',saltText, cols[0])
         newLines.append(salted + ',' + cols[1])

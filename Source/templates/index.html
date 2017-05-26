@@ -8,9 +8,10 @@
       <table>
         {% for summary in summaries %}
             <tr>
-               <td><p>{{ summary['description'] }}</p></td>
+               <!--<td><p>{{ summary['description'] }}</p></td>-->
+               <td><p>{{ summary['run_on'] }}</p></td>               
+               <td><a href="{{summary['report']}}">{{ summary['description'] }}</a></td>
                <td><a href="{{summary['zip']}}">Artifacts</a></td>
-               <td><a href="{{summary['report']}}">HTML Report</a></td>
                <td><a href="{{summary['overall']}}">Overall</a></td>
                <td><a href="{{summary['old']}}">Old</a></td>
                <td><a href="{{summary['new']}}">New</a></td>
@@ -30,17 +31,50 @@
     <form action="executeTest" method="post">
       <table>
         <tbody>
-          {% for key, val in allParams.items() %}
-            {%if key != "time_run" %}
+          <style> .bg_for_old { background: lightblue; } </style>
+          <style> .bg_for_new { background: lightgreen; } </style>
+          <style> .config_odd { background: lightgray; } </style>
+          <style> .config_even { background: whitesmoke; } </style>
+          
+          {% for key, val in allParams|dictsort %}
+            {%if key != "time_run" and key.endswith("old")  %}
               <tr>
-                <td>
+                <td class="bg_for_old" >
                   {{key}}:
                 </td>
-                <td>
+                <td class="bg_for_old">
                   <input type="text" name="{{key}}" value="{{val}}">
                 </td>
               </tr>
-            {% else %}
+            {% endif %}
+          {% endfor %}
+          {% for key, val in allParams|dictsort %}
+            {%if key != "time_run" and ( not key.endswith("old") and not key.endswith("new") ) %}
+              <tr class="{{ loop.cycle('config_odd', 'config_even') }}">
+                <td>
+                  {{key}}:
+                </td>
+                <td >
+                  <input type="text" name="{{key}}" value="{{val}}"  >
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+          {% for key, val in allParams|dictsort %}
+            {%if key != "time_run" and key.endswith("new") %}
+              <tr class="bg_for_new">
+                <td>
+                  {{key}}:
+                </td>
+                <td >
+                  <input type="text" name="{{key}}" value="{{val}}">
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+
+          {% for key, val in allParams|dictsort %}
+            {%if key == "time_run" %}
               <tr>
                 <td>
                 </td>
@@ -48,15 +82,15 @@
                   <input type="text" name="{{key}}" value="{{val}}" hidden="true">
                 </td>
               </tr>
+            
             {% endif %}
-
           {% endfor %}
           <tr>
             <td>
               Salt Data:
             </td>
             <td>
-              <input type="text" name="SaltDatasetText" value="swag">
+              <input type="text" name="SaltDatasetText" value="{{saltDataText}}">
             </td>
           </tr>
           <tr>
